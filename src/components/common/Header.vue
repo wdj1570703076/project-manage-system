@@ -9,7 +9,7 @@
         <div class="header-right">
             <div class="header-user-con">
                 余额： {{balance}}元
-                <button data-v-3ceb3501="" type="button" class="el-button el-button--text" style="color: #f5f7fa;">
+                <button data-v-3ceb3501="" type="button" class="el-button el-button--text" style="color: #f5f7fa;" @click="changeBalance">
                     <i class="el-icon-refresh"></i><span>刷新</span>
                 </button>
                 &nbsp;&nbsp;&nbsp;
@@ -30,7 +30,7 @@
                         <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                        <a href="https://github.com/lin-xin/vue-manage-system" target="_blank">
+                        <a href="https://github.com/wdj1570703076/project-manage-system.git" target="_blank">
                             <el-dropdown-item>项目仓库</el-dropdown-item>
                         </a>
                         <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
@@ -48,7 +48,7 @@ export default {
         return {
             collapse: false,
             fullscreen: false,
-            name: 'linxin',
+            name: 'wdj',
             message: 2,
             query: {
                 address: '/admin/liveBalance'
@@ -70,13 +70,18 @@ export default {
                 this.$router.push('/login');
             }
         },
+        changeBalance(){
+            fetchData(this.query).then(res => {
+                this.balance = res.data.tyscore;
+                this.$message.success("余额刷新成功！")
+            }).catch((e) => {
+                this.$message.error("余额刷新失败！")
+            });
+        },
         // 侧边栏折叠
         collapseChage() {
             this.collapse = !this.collapse;
             bus.$emit('collapse', this.collapse);
-            fetchData(this.query).then(res => {
-                this.balance = res.data.tyscore;
-            });
         },
         // 全屏事件
         handleFullScreen() {
@@ -107,6 +112,7 @@ export default {
         }
     },
     mounted() {
+        this.changeBalance();
         if (document.body.clientWidth < 1500) {
             this.collapseChage();
         }

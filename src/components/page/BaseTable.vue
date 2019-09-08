@@ -10,7 +10,7 @@
         <div class="container">
             <div class="handle-box">
                 <el-button type="primary" icon="el-icon-plus" class="handle-del" @click="handleEdit()"><span>添加</span></el-button>
-                <el-button type="primary" icon="el-icon-delete" class="handle-del mr10" @click="delAllSelection()">批量删除</el-button>
+                <el-button type="primary" icon="el-icon-delete" class="handle-del mr10" @click="delAllSelection()">删除</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
@@ -30,13 +30,10 @@
                    <label class="el-form-item__label">会员帐号</label>
                    <div class="el-form-item__content">
                        <div class="el-input el-input--mini el-input-group el-input-group--append el-input--suffix" style="width: 340px;">
-                           <input type="text" autocomplete="off" autofocus="autofocus" placeholder="多个账号请用逗号隔开" class="el-input__inner">
+                           <input type="text" autocomplete="off" autofocus="autofocus" placeholder="多个账号请用逗号隔开" class="el-input__inner" v-model="subQuery.account">
                            <div class="el-input-group__append">
                                <label role="checkbox" class="el-checkbox">
-                                   <span aria-checked="mixed" class="el-checkbox__input">
-                                       <span class="el-checkbox__inner">
-                                       </span><input type="checkbox" aria-hidden="true" class="el-checkbox__original" value="">
-                                   </span>
+                                   <el-checkbox v-model="subQuery.accountFuzzy" value="true"></el-checkbox>
                                    <span class="el-checkbox__label">模糊匹配</span>
                                </label>
                            </div>
@@ -47,14 +44,10 @@
                     <label class="el-form-item__label">会员姓名</label>
                     <div class="el-form-item__content">
                         <div class="el-input el-input--mini el-input-group el-input-group--append el-input--suffix" style="width: 280px;">
-                            <input type="text" autocomplete="off" placeholder="输入会员姓名" class="el-input__inner">
+                            <input type="text" autocomplete="off" placeholder="输入会员姓名" class="el-input__inner" v-model="subQuery.fullName">
                             <div class="el-input-group__append">
-                                <label role="checkbox" class="el-checkbox">
-                                    <span aria-checked="mixed" class="el-checkbox__input">
-                                        <span class="el-checkbox__inner">
-                                        </span><input type="checkbox" aria-hidden="true" class="el-checkbox__original" value="">
-                                    </span><span class="el-checkbox__label">模糊匹配</span>
-                                </label>
+                                <el-checkbox v-model="subQuery.fullNameFuzzy" value="true"></el-checkbox>
+                                <span class="el-checkbox__label">模糊匹配</span>
                             </div>
                         </div>
                     </div>
@@ -63,32 +56,10 @@
                     <label class="el-form-item__label">会员类型</label>
                     <div class="el-form-item__content">
                         <div class="el-select el-select--mini" style="width: 100px;">
-                            <div class="el-input el-input--mini el-input--suffix">
-                                <input type="text" autocomplete="off" placeholder="全部类型" readonly="readonly" class="el-input__inner">
-                                <span class="el-input__suffix">
-                                    <span class="el-input__suffix-inner">
-                                        <i class="el-select__caret el-input__icon el-icon-arrow-up"></i>
-                                    </span>
-                                </span>
-                            </div>
-                            <div class="el-select-dropdown el-popper" style="display: none; min-width: 100px;">
-                                <div class="el-scrollbar" style="">
-                                    <div class="el-select-dropdown__wrap el-scrollbar__wrap" style="margin-bottom: -17px; margin-right: -17px;">
-                                        <ul class="el-scrollbar__view el-select-dropdown__list">
-                                            <li class="el-select-dropdown__item selected">
-                                                <span>会员</span>
-                                            </li>
-                                            <li class="el-select-dropdown__item">
-                                                <span>试玩帐号</span>
-                                            </li>
-                                            <li class="el-select-dropdown__item"><span>推广帐号</span></li>
-                                        </ul></div><div class="el-scrollbar__bar is-horizontal">
-                                    <div class="el-scrollbar__thumb" style="transform: translateX(0%);"></div>
-                                    </div><div class="el-scrollbar__bar is-vertical">
-                                        <div class="el-scrollbar__thumb" style="transform: translateY(0%);"></div>
-                                    </div>
-                                </div>
-                            </div>
+                            <el-select v-model="subQuery.type" placeholder="全部类型">
+                                <el-option v-for="item in options" :label="item.text" :key="item.value" :value="item.value">
+                                </el-option>
+                            </el-select>
                         </div>
                     </div>
                 </div>
@@ -96,43 +67,14 @@
                     <label class="el-form-item__label">状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                     <div class="el-form-item__content">
                         <div class="el-select el-select--mini" style="width: 100px;">
-                            <div class="el-input el-input--mini el-input--suffix">
-                                <input type="text" autocomplete="off" placeholder="全部状态" readonly="readonly" class="el-input__inner">
-                                <span class="el-input__suffix"><span class="el-input__suffix-inner">
-                                    <i class="el-select__caret el-input__icon el-icon-arrow-up"></i>
-                                </span>
-                                </span>
-                            </div>
-                            <div class="el-select-dropdown el-popper" style="display: none; min-width: 100px;">
-                                <div class="el-scrollbar" style="">
-                                    <div class="el-select-dropdown__wrap el-scrollbar__wrap" style="margin-bottom: -17px; margin-right: -17px;">
-                                        <ul class="el-scrollbar__view el-select-dropdown__list">
-                                            <li class="el-select-dropdown__item">
-                                                <span>正常</span>
-                                            </li>
-                                            <li class="el-select-dropdown__item">
-                                                <span>停用</span>
-                                            </li>
-                                            <li class="el-select-dropdown__item">
-                                                <span>冻结</span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="el-scrollbar__bar is-horizontal">
-                                        <div class="el-scrollbar__thumb" style="transform: translateX(0%);">
-
-                                        </div>
-                                    </div>
-                                    <div class="el-scrollbar__bar is-vertical">
-                                        <div class="el-scrollbar__thumb" style="transform: translateY(0%);">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <el-select v-model="subQuery.state" placeholder="全部状态">
+                                <el-option v-for="item in options2" :label="item.text" :key="item.value" :value="item.value">
+                                </el-option>
+                            </el-select>
                         </div>
                     </div>
                 </div>
-                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                <el-button type="primary" icon="el-icon-search" @click="subHandleSearch">查询</el-button>
             </div>
             <el-table :data="subTableData" border class="table" ref="multipleTable" header-cell-class-name="table-header" @selection-change="subHandleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
@@ -160,7 +102,6 @@ export default {
         return {
             query: {
                 address: '/admin/ags',
-                name: '',
                 pageIndex: 1,
                 pageSize: 10
             },
@@ -171,7 +112,6 @@ export default {
             pageTotal: 0,
             subQuery: {
                 address: '/user/query',
-                type: 'HY',
                 accountFuzzy: false,
                 fullNameFuzzy: false,
                 regIpFuzzy: false,
@@ -185,7 +125,19 @@ export default {
             subPageTotal: 0,
             form: {},
             idx: -1,
-            id: -1
+            id: -1,
+            options:[
+                {value:'',text:"全部类型"},
+                {value:'HY',text:"会员"},
+                {value:'TEST',text:"试玩账号"},
+                {value:'VHY',text:"推广账号"}
+            ],
+            options2:[
+                {value:'',text:"全部状态"},
+                {value:'1',text:"正常"},
+                {value:'2',text:"停用"},
+                {value:'3',text:"冻结"}
+            ]
         };
     },
     created() {
@@ -216,6 +168,7 @@ export default {
             let subMultiple = {"id":this.multipleSelection[0].id};
             deleteData(subMultiple).then(res => {
                 this.$message.success("删除成功！")
+                this.fetch();
             }).catch((e) => {
                 this.$message.error("删除失败！")
             });
@@ -237,7 +190,7 @@ export default {
             this.subMultipleSelection = val;
         },
         subGetData() {
-            fetchData(this.subQuery).then(res => {
+            fetchData(this.cleanParams(this.subQuery)).then(res => {
                 this.subTableData = res.data;
                 this.subPageTotal = res.totalCount || 50;
             });
@@ -263,8 +216,29 @@ export default {
             }).catch((e) => {
                 this.$message.error("添加失败！")
             });
-            this.editVisible = false;
+            this.fetch();
             this.subMultipleSelection = [];
+        },
+        // 触发搜索按钮
+        subHandleSearch() {
+            this.$set(this.cleanParams(this.subQuery), 'page', 1);
+            this.subGetData();
+        },
+        //刷新页面
+        fetch () {
+            this.editVisible = false;
+            this.getData();
+        },
+        cleanParams(val){
+            let v_data ={};
+            for(let a in val){
+                if (val[a] != null && val[a] != '') {
+                    v_data[a] = val[a];
+                }else if(a == 'accountFuzzy' || a == 'regIpFuzzy' || a == 'fullNameFuzzy'){
+                    v_data[a] = false;
+                }
+            }
+            return v_data;
         }
     }
 };

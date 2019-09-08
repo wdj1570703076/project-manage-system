@@ -23,7 +23,7 @@
 
 <script>
 import { loginCheck } from '../../api/index';
-import crypto from 'crypto'
+import crypto from 'crypto';
 export default {
     data: function() {
         return {
